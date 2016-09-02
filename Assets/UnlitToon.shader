@@ -17,6 +17,7 @@
 			// light data set up; light direction in _WorldSpaceLightPos0
 			// and color in _LightColor0
 			Tags{ "LightMode" = "ForwardBase" }
+			//Tags{ "RenderType" = "Opaque" }
 
 			CGPROGRAM
 			#pragma vertex vert

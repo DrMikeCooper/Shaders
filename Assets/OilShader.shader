@@ -63,7 +63,7 @@
 
 				for (int k =0; k < 10; k++)
 				{
-					float x0 = xx[k] + _Timer *uu[k];
+					float x0 = xx[k];// +_Timer *uu[k];
 					float y0 = yy[k] + _Timer* vv[k];
 
 					float x = (_Scale * i.uv.x) - x0;
@@ -73,7 +73,7 @@
 					//x0 -= ix;
 					//y0 -= iy;
 					float d2 = x*x + y*y;
-					float rd2 = 1.0 / (1.0 + d2); // 1 at centre, tails off to zero
+					float rd2 = 1.0 / (0.2 + d2); // 1 at centre, tails off to zero
 					intensity += rd2;
 				}
 				
