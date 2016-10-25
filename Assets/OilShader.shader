@@ -61,17 +61,32 @@
 				//float vv[10] = {  -0.5,  0.2, -0.3, 0.4, -0.8, 0.6, -0.7, 0.0, -0.1, -0.9 };
 				float vv[10] = { 0.4,  -0.2, 0.3, -0.4, 0.25, -0.33, 0.34, -0.21, 0.31, -0.41 };
 
-				for (int k =0; k < 10; k++)
+				/*for (int k =0; k < 10; k++)
 				{
-					float x0 = xx[k];// +_Timer *uu[k];
+					float x0 = xx[k] + _Timer *uu[k];
 					float y0 = yy[k] + _Timer* vv[k];
 
 					float x = (_Scale * i.uv.x) - x0;
 					float y = (_Scale * i.uv.y) - y0;
-					//int ix = x0;
-					//int iy = y0;
-					//x0 -= ix;
-					//y0 -= iy;
+					float d2 = x*x + y*y;
+					float rd2 = 1.0 / (0.2 + d2); // 1 at centre, tails off to zero
+					intensity += rd2;
+				}*/
+
+				// harmonics
+				for (int k = 1; k < 10; k++)
+				{
+					float x0 = xx[k] + _Timer *uu[k];
+					float y0 = yy[k] + _Timer* vv[k];
+
+					float x = 100 + (k * i.uv.x) - x0;
+					float y = 100 + (k * i.uv.y) - y0;
+
+					int ix = x;
+					x = x - 0.5f  - ix;
+					int iy = y;
+					y = y - 0.5f - iy;
+
 					float d2 = x*x + y*y;
 					float rd2 = 1.0 / (0.2 + d2); // 1 at centre, tails off to zero
 					intensity += rd2;
