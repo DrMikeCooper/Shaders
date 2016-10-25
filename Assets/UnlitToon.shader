@@ -45,7 +45,7 @@
 
 			sampler2D _MainTex;
 			float4 _MainTex_ST;
-			int _ColorIndex;
+			float _ColorIndex;
 
 			v2f vert (appdata v)
 			{
@@ -61,8 +61,19 @@
 			{
 				half nl = max(0, dot(i.normal, _WorldSpaceLightPos0.xyz));
 
-				float v0 = (2*_ColorIndex+1)/32.0f;
+				float v0 = (2 * _ColorIndex + 1) / 32.0f;
 				fixed4 col = tex2D(_MainTex, float2(nl, v0));
+
+				/*
+				_ColorIndex = 0;
+				half nl = max(0, dot(i.normal, _WorldSpaceLightPos0.xyz));
+				float v0 = (2 * _ColorIndex + 1) / 32.0f;
+				float2 uv = i.uv;
+				uv.y = v0;
+				uv.x = nl;
+				fixed4 col = tex2D(_MainTex, uv);
+				*/
+
 				// factor in the light color
 				//o.diff = nl * _LightColor0;
 				// apply fog
