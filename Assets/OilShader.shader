@@ -7,6 +7,8 @@
 		_OriginY("OriginY", float) = 0.5
 		_Scale("Scale", float) = 3
 		_Timer("Timer", float) = 0
+		_BHRadius("BH Radius", float) = 100
+		_BHOrigin("BH Origin", Vector) = (0,0,0,0)
 	}
 	SubShader
 	{
@@ -42,14 +44,30 @@
 			float _OriginY;
 			float _Scale;
 			float _Timer;
+			float _BHRadius;
+			float4 _BHOrigin;
 
 			v2f vert (appdata v)
 			{
+				//v2f o;
+				//o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
+				//o.uv = v.uv;
+				//UNITY_TRANSFER_FOG(o,o.vertex);
+				//return o;
+
 				v2f o;
-				o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
-				o.uv = v.uv;
-				UNITY_TRANSFER_FOG(o,o.vertex);
+				float4 v0 = mul(UNITY_MATRIX_M, v.vertex);
+				float dist = (v0.x - _BHOrigin.x)*(v0.x - _BHOrigin.x) + (v0.z - _BHOrigin.z)*(v0.z - _BHOrigin.z);
+				float radius = _BHRadius*_BHRadius;
+				float factor = clamp(dist / radius, 0.0, 1.0);
+				v0.x = _BHOrigin.x + (v0.x-_BHOrigin.x) * factor;
+				v0.z = _BHOrigin.z + (v0.z-_BHOrigin.z) * factor;
+				o.vertex = mul(UNITY_MATRIX_VP, v0);
+				o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+				UNITY_TRANSFER_FOG(o, o.vertex);
+				//o.normal = UnityObjectToWorldNormal(v.normal);
 				return o;
+
 			}
 			
 			fixed4 frag (v2f i) : SV_Target
@@ -61,6 +79,9 @@
 				//float vv[10] = {  -0.5,  0.2, -0.3, 0.4, -0.8, 0.6, -0.7, 0.0, -0.1, -0.9 };
 				float vv[10] = { 0.4,  -0.2, 0.3, -0.4, 0.25, -0.33, 0.34, -0.21, 0.31, -0.41 };
 
+				// cos and sin of random angles
+				float acs[10] = {1, 0.5, -0.866, 0.707, 0.3, 0.1, 0.866, -0.707, -0.95, 0};
+				float asn[10] = {0, 0.866, 0.5, -0.707, 0.95, -0.995, 0.5, -0.707, 0.1, -1};
 				/*for (int k =0; k < 10; k++)
 				{
 					float x0 = xx[k] + _Timer *uu[k];
@@ -79,8 +100,8 @@
 					float x0 = xx[k] + _Timer *uu[k];
 					float y0 = yy[k] + _Timer* vv[k];
 
-					float x = 100 + (k * i.uv.x) - x0;
-					float y = 100 + (k * i.uv.y) - y0;
+					float x = 100 + (k * (acs[k]*i.uv.x + asn[k]*i.uv.y)) - x0;
+					float y = 100 + (k * (acs[k]*i.uv.y - asn[k]*i.uv.x)) - y0;
 
 					int ix = x;
 					x = x - 0.5f  - ix;
@@ -96,8 +117,8 @@
 				intensity = count * 0.1;
 				count = intensity;
 				intensity = intensity - count;
-				intensity = 0.5 * (1 + intensity);
-				fixed4 col = fixed4(0.4*intensity, intensity, 0.6*intensity, 1);
+				intensity = 0.1 * (9 + intensity);
+				fixed4 col = fixed4(intensity, 0.4*intensity, 0.8*intensity, 1);
 				// apply fog
 				UNITY_APPLY_FOG(i.fogCoord, col);				
 				return col;

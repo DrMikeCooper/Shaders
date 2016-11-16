@@ -4,6 +4,8 @@
 	{
 		_MainTex ("Texture", 2D) = "white" {}
 	    _ColorIndex ("Color Index", Range(0, 15)) = 0
+		_BHRadius("BH Radius", float) = 100
+		_BHOrigin("BH Origin", Vector) = (0,0,0,0)
 	}
 	SubShader
 	{
@@ -46,11 +48,19 @@
 			sampler2D _MainTex;
 			float4 _MainTex_ST;
 			float _ColorIndex;
+			float _BHRadius;
+			float4 _BHOrigin;
 
 			v2f vert (appdata v)
 			{
 				v2f o;
-				o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
+				float4 v0 = mul(UNITY_MATRIX_M, v.vertex);
+				float dist = (v0.x-_BHOrigin.x)*(v0.x - _BHOrigin.x) + (v0.z - _BHOrigin.z)*(v0.z - _BHOrigin.z);
+				float radius = _BHRadius*_BHRadius;
+				float factor = clamp(dist / radius, 0.0, 1.0);
+				v0.x = _BHOrigin.x + (v0.x - _BHOrigin.x) * factor;
+				v0.z = _BHOrigin.z + (v0.z - _BHOrigin.z) * factor;
+				o.vertex = mul(UNITY_MATRIX_VP, v0);
 				o.uv = TRANSFORM_TEX(v.uv, _MainTex);
 				UNITY_TRANSFER_FOG(o,o.vertex);
 				o.normal = UnityObjectToWorldNormal(v.normal);

@@ -15,7 +15,7 @@ public class VRCameraSimple : MonoBehaviour {
         Vector3 fwd = transform.forward;
         fwd.y = 0;
         bool lookingDown = false;
-        if (transform.eulerAngles.x > 25)
+        if (transform.eulerAngles.x > 10 && transform.eulerAngles.x < 25)
         {
             lookingDown = true;
             transform.parent.position = transform.parent.position + fwd * 0.3f;
